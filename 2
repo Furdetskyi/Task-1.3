@@ -1,0 +1,53 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.metrics import roc_curve, auc, confusion_matrix, accuracy_score
+
+# --- Тестові дані (замінити на свої) ---
+ytrue = np.array([0, 1, 0, 1, 1, 0, 1, 0, 1, 0])
+yhat = np.array([0.1, 0.8, 0.4, 0.9, 0.2, 0.85, 0.3, 0.6, 0.05, 0.7])
+
+# --- 1. Побудова ROC-кривої ---
+fpr, tpr, thresholds = roc_curve(ytrue, yhat)
+roc_auc = auc(fpr, tpr)
+
+plt.figure(figsize=(6, 6))
+plt.plot(fpr, tpr, color="blue", label=f"ROC curve (AUC = {roc_auc:.2f})")
+plt.plot([0, 1], [0, 1], color="gray", linestyle="--")
+plt.xlabel("False Positive Rate")
+plt.ylabel("True Positive Rate")
+plt.title("ROC-крива")
+plt.legend(loc="lower right")
+plt.grid(True)
+plt.show()
+
+# --- 2. Обчислення матриці плутанини ---
+threshold = 0.5  # можна змінювати
+ypred = (yhat >= threshold).astype(int)
+cm = confusion_matrix(ytrue, ypred)
+
+# Візуалізація матриці плутанини
+fig, ax = plt.subplots()
+im = ax.imshow(cm, cmap="Blues")
+
+# Підписи
+ax.set_xticks([0, 1])
+ax.set_yticks([0, 1])
+ax.set_xticklabels(["Негативний (0)", "Позитивний (1)"])
+ax.set_yticklabels(["Негативний (0)", "Позитивний (1)"])
+plt.xlabel("Прогнозовані класи")
+plt.ylabel("Справжні класи")
+plt.title("Матриця плутанини")
+
+# Підписати числа в клітинках
+for i in range(cm.shape[0]):
+    for j in range(cm.shape[1]):
+        ax.text(j, i, cm[i, j], ha="center", va="center", color="black")
+
+plt.colorbar(im)
+plt.show()
+
+# --- 3. Точність ---
+acc = accuracy_score(ytrue, ypred)
+print("Матриця плутанини:")
+print(cm)
+print(f"Точність (Accuracy): {acc:.2f}")
